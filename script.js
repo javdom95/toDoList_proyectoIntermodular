@@ -3,16 +3,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const addTaskBtn = document.getElementById('add-task-btn')
     const taskList = document.getElementById('task-list')
     const emptyImage = document.querySelector('.empty-image')
+    const todosContainer = document.querySelector('.todos-container');
 
     const toggleEmptyState = () => {
-        emptyImage.computedStyleMap.display = taskList.children.length === 0 ? 'block' : 'none'
+        emptyImage.style.display = taskList.children.length === 0 ? 'block' : 'none'
+        todosContainer.style.width = taskList.children.length > 0 ? '100%' : '50%'
     }
 
-
+    // 17:09 video
 
     const addTask = (event) => {
         event.preventDefault()
-        const taskText = taskInput.ariaValueMax.trim();
+        const taskText = taskInput.value.trim();
         if(!taskText){
             return
         }
@@ -21,7 +23,24 @@ document.addEventListener('DOMContentLoaded', () => {
         li.innerHTML = `
         <input type="checkbox" class="checkbox">
         <span>${taskText}</span>
+        <div class="task-buttons">
+            <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
+            <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+        </div>
         `
+
+        const editBtn = li.querySelector('.edit-btn')
+
+        editBtn.addEventListener('click', () => {
+            if(!checkbox.checked) {
+                taskInput.value = li.querySelector('span').textContent;
+            }
+        })
+        
+        li.querySelector('.delete-btn').addEventListener('click', () => {
+            li.remove()
+            toggleEmptyState()
+        })
 
         taskList.appendChild(li)
         taskInput.value = ''
