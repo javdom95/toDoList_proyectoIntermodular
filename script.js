@@ -4,36 +4,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskList = document.getElementById('task-list')
     const emptyImage = document.querySelector('.empty-image')
     const todosContainer = document.querySelector('.todos-container');
+    // 22:38 timestamp
 
     const toggleEmptyState = () => {
         emptyImage.style.display = taskList.children.length === 0 ? 'block' : 'none'
         todosContainer.style.width = taskList.children.length > 0 ? '100%' : '50%'
     }
 
-    // 17:09 video
-
-    const addTask = (event) => {
-        event.preventDefault()
-        const taskText = taskInput.value.trim();
+    const addTask = (text, completed = false) => {
+        const taskText = text || taskInput.value.trim();
         if(!taskText){
             return
         }
 
         const li = document.createElement('li')
         li.innerHTML = `
-        <input type="checkbox" class="checkbox">
+        <input type="checkbox" class="checkbox" ${completed ? 'checked': ''} />
         <span>${taskText}</span>
         <div class="task-buttons">
             <button class="edit-btn"><i class="fa-solid fa-pen"></i></button>
             <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
         </div>
         `
-
+        
+        const checkbox = li.querySelector('.checkbox')
         const editBtn = li.querySelector('.edit-btn')
+
+        if (completed) {
+            li.classList.add('completed')
+            editBtn.disabled = true
+            editBtn.style.opacity = '0.5'
+            editBtn.style.pointerEvents = 'none'
+        }
+
+        checkbox.addEventListener('change', () => {
+            const isChecked = checkbox.checked
+            li.classList.toggle('completed', isChecked)
+            editBtn.disabled = isChecked
+            editBtn.style.opacity = isChecked ? '0.5' : '1'
+            editBtn.style.pointerEvents = isChecked ? 'none' : 'auto'
+        })
 
         editBtn.addEventListener('click', () => {
             if(!checkbox.checked) {
                 taskInput.value = li.querySelector('span').textContent;
+                li.remove()
+                toggleEmptyState()
             }
         })
         
@@ -47,10 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleEmptyState() 
     } 
 
-    addTaskBtn.addEventListener('click', addTask)
+    addTaskBtn.addEventListener('click', () => addTask()) // Hacer clic refresca la pagina
     taskInput.addEventListener('keypress', (e) => {
         if(e.key === 'Enter') {
-            addTask(e)
+        e.preventDefault()
+            addTask()
         }
     })
 })
